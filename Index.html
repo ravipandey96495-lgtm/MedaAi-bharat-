@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MedAI Bharat – Made in India 🇮🇳 | AI-Powered Healthcare</title>
+<meta name="description" content="MedAI Bharat - India's most advanced AI-powered medical platform. Symptom checker, health calculators, AI chatbot, and more." />
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fontsource-inter@5.0.0/index.min.css" />
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+      colors: {
+        saffron: { 50:'#fff7ed', 100:'#ffedd5', 500:'#f97316', 600:'#ea580c', 700:'#c2410c' },
+        india: { green:'#138808', saffron:'#FF9933', navy:'#000080' },
+      },
+      animation: {
+        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'float': 'float 6s ease-in-out infinite',
+        'glow': 'glow 2s ease-in-out infinite alternate',
+      },
+      keyframes: {
+        float: { '0%,100%':{transform:'translateY(0)'}, '50%':{transform:'translateY(-10px)'} },
+        glow: { '0%':{boxShadow:'0 0 20px rgba(249,115,22,0.3)'}, '100%':{boxShadow:'0 0 40px rgba(249,115,22,0.6)'} },
+      }
+    }
+  }
+}
+</script>
+<style>
+  * { scroll-behavior: smooth; }
+  body { font-family: 'Inter', sans-serif; }
+  .gradient-text {
+    background: linear-gradient(135deg, #FF9933 0%, #ffffff 50%, #138808 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .gradient-bg {
+    background: linear-gradient(135deg, #FF9933 0%, #138808 100%);
+  }
+  .glass {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .dark .glass { background: rgba(17,24,39,0.6); }
+  .light .glass { background: rgba(255,255,255,0.7); border: 1px solid rgba(0,0,0,0.05); }
+  .card-hover { transition: all 0.3s ease; }
+  .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(249,115,22,0.15); }
+  .nav-link { position: relative; }
+  .nav-link::after {
+    content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px;
+    background: linear-gradient(90deg, #FF9933, #138808); transition: width 0.3s;
+  }
+  .nav-link:hover::after, .nav-link.active::after { width: 100%; }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  .chat-bubble { animation: slideIn 0.3s ease; }
+  @keyframes slideIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .loader { border-top-color: #FF9933; animation: spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .indicator { position: relative; }
+  .indicator::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(135deg, #FF9933, #138808);
+    border-radius: inherit; z-index: -1; filter: blur(10px); opacity: 0.5;
+  }
+  .badge-india {
+    background: linear-gradient(135deg, #FF9933, #ffffff, #138808);
+    padding: 2px; border-radius: 9999px;
+  }
+  .badge-india-inner { background: inherit; border-radius: 9999px; }
+  input, select, textarea { font-family: inherit; }
+  .tab-active { background: linear-gradient(135deg, #FF9933, #138808); color: white; }
+  .progress-ring { transform: rotate(-90deg); }
+</style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+
+<!-- Top Banner -->
+<div class="bg-gradient-to-r from-india-saffron via-white to-india-green text-gray-900 dark:text-gray-900 py-1.5 text-xs text-center font-semibold">
+  🇮 Made in India with ❤️ | HIPAA-Inspired Privacy | End-to-End Encrypted
+</div>
+
+<!-- Navigation -->
+<nav class="sticky top-0 z-50 glass border-b border-gray-200 dark:border-gray-800">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+      <div class="flex items-center gap-3 cursor-pointer" onclick="showPage('home')">
+        <div class="w-10 h-10 rounded-xl gradient-bg flex items-center justify-center text-white font-bold text-lg shadow-lg">
+          <i class="fas fa-heartbeat"></i>
+        </div>
+        <div>
+          <div class="font-bold text-lg leading-tight">MedAI <span class="gradient-text">Bharat</span></div>
+          <div class="text-[10px] text-gray-500 dark:text-gray-400 -mt-1">Made in India 🇮🇳</div>
+        </div>
+      </div>
+
+      <div class="hidden lg:flex items-center gap-6 text-sm">
+        <button onclick="showPage('home')" class="nav-link active" data-page="home">Home</button>
+        <button onclick="showPage('symptoms')" class="nav-link" data-page="symptoms">Symptom Checker</button>
+        <button onclick="showPage('chatbot')" class="nav-link" data-page="chatbot">AI Chatbot</button>
+        <button onclick="showPage('calculators')" class="nav-link" data-page="calculators">Health Tools</button>
+        <button onclick="showPage('dashboard')" class="nav-link" data-page="dashboard">Dashboard</button>
+        <button onclick="showPage('services')" class="nav-link" data-page="services">Services</button>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <!-- Language Selector -->
+        <select id="langSelect" onchange="changeLanguage(this.value)" class="bg-transparent border border-gray-300 dark:border-gray-700 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-orange-500">
+          <option value="en">🇧 English</option>
+          <option value="hi">🇮🇳 हिन्दी</option>
+          <option value="mr">मराठी</option>
+          <option value="ta">தமிழ்</option>
+          <option value="te">తెలుగు</option>
+          <option value="bn">বাংলা</option>
+          <option value="gu">ગુજરાતી</option>
+          <option value="pa">ਪੰਜਾਬੀ</option>
+          <option value="ur">اردو</option>
+          <option value="ml">മലയാളം</option>
+          <option value="kn">ಕನ್ನಡ</option>
+        </select>
+
+        <!-- Theme Toggle -->
+        <button onclick="toggleTheme()" class="w-9 h-9 rounded-lg border border-gray-300 dark:border-gray-700 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+          <i class="fas fa-sun dark:hidden"></i>
+          <i class="fas fa-moon hidden dark:block text-yellow-400"></i>
+        </button>
+
+        <!-- Voice -->
+        <button onclick="toggleVoice()" class="w-9 h-9 rounded-lg border border-gray-300 dark:border-gray-700 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 transition relative">
+          <i class="fas fa-microphone"></i>
+          <span id="voiceIndicator" class="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full hidden animate-pulse"></span>
+        </button>
+
+        <button onclick="showPage('login')" class="hidden sm:block px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-sm font-medium transition">Sign In</button>
+        <button onclick="showPage('login')" class="px-4 py-2 rounded-lg gradient-bg text-white text-sm font-medium hover:shadow-lg transition">Get Started</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- PAGE: HOME -->
+<section id="page-home" class="page">
+  <!-- Hero -->
+  <div class="relative overflow-hidden">
+    <div class="absolute inset-0 opacity-20 dark:opacity-30">
+      <img src="https://image.qwenlm.ai/public_source/42f480e2-f0ba-4b41-a489-4f47653362eb/12685f48b-9beb-4f5a-8c32-9dae62c1cf24.png" class="w-full h-full object-cover" alt="" />
+    </div>
+    <div class="absolute inset-0 bg-gradient-to-b from-white/80 via-white/60 to-white dark:from-gray-950/80 dark:via-gray-950/60 dark:to-gray-950"></div>
+    
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
+      <div class="grid lg:grid-cols-2 gap-12 items-center">
+        <div>
+          <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-6 animate-float">
+            <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+            <span class="text-sm font-medium">🇳 Made in India • Trusted by 2M+ Indians</span>
+          </div>
+          <h1 class="text-5xl lg:text-7xl font-bold leading-tight mb-6">
+            Your <span class="gradient-text">AI Doctor</span><br/>
+            Available 24/7
+          </h1>
+          <p class="text-lg text-gray-600 dark:text-gray-400 mb-8 max-w-xl">
+            India's most advanced AI-powered healthcare platform. Get instant symptom analysis, personalized health insights, and connect with top doctors — all in your language.
+          </p>
+          <div class="flex flex-wrap gap-4 mb-8">
+            <button onclick="showPage('symptoms')" class="px-8 py-4 rounded-xl gradient-bg text-white font-semibold hover:shadow-2xl transition transform hover:scale-105">
+              <i class="fas fa-stethoscope mr-2"></i>Check Symptoms
+            </button>
+            <button onclick="showPage('chatbot')" class="px-8 py-4 rounded-xl glass font-semibold hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+              <i class="fas fa-robot mr-2"></i>Talk to AI
+            </button>
+          </div>
+          <div class="flex flex-wrap gap-6 text-sm">
+            <div class="flex items-center gap-2"><i class="fas fa-check-circle text-green-500"></i>100+ Languages</div>
+            <div class="flex items-center gap-2"><i class="fas fa-check-circle text-green-500"></i>HIPAA-Inspired</div>
+            <div class="flex items-center gap-2"><i class="fas fa-check-circle text-green-500"></i>End-to-End Encrypted</div>
+          </div>
+        </div>
+        <div class="relative hidden lg:block">
+          <div class="relative rounded-3xl overflow-hidden shadow-2xl indicator">
+            <img src="https://image.qwenlm.ai/public_source/42f480e2-f0ba-4b41-a489-4f47653362eb/12685f48b-9beb-4f5a-8c32-9dae62c1cf24.png" class="w-full h-[500px] object-cover" alt="AI Medical" />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+            <div class="absolute bottom-6 left-6 right-6 glass rounded-2xl p-4">
+              <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full gradient-bg flex items-center justify-center text-white">
+                  <i class="fas fa-robot"></i>
+                </div>
+                <div class="flex-1">
+                  <div class="font-semibold">MedAI Assistant</div>
+                  <div class="text-xs text-gray-400">Analyzing symptoms...</div>
+                </div>
+                <span class="px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-xs font-medium">Active</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="glass rounded-2xl p-6 card-hover text-center">
+        <div class="text-3xl font-bold gradient-text">2M+</div>
+        <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">Active Users</div>
+      </div>
+      <div class="glass rounded-2xl p-6 card-hover text-center">
+        <div class="text-3xl font-bold gradient-text">15K+</div>
+        <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">Verified Doctors</div>
+      </div>
+      <div class="glass rounded-2xl p-6 card-hover text-center">
+        <div class="text-3xl font-bold gradient-text">100+</div>
+        <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">Languages</div>
+      </div>
+      <div class="glass rounded-2xl p-6 card-hover text-center">
+        <div class="text-3xl font-bold gradient-text">98%</div>
+        <div class="text-sm text-gray-500 dark:text-gray-400 mt-1">Accuracy Rate</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features Grid -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="text-center mb-12">
+      <h2 class="text-4xl font-bold mb-4">Complete <span class="gradient-text">Healthcare</span> Ecosystem</h2>
+      <p class="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">Everything you need for your health journey, powered by cutting-edge AI</p>
+    </div>
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div onclick="showPage('symptoms')" class="glass rounded-2xl p-6 card-hover cursor-pointer">
+        <div class="w-12 h-12 rounded-xl bg-orange-500/20 flex items-center justify-center text-orange-500 mb-4"><i class="fas fa-stethoscope text-xl"></i></div>
+        <h3 class="font-bold text-lg mb-2">AI Symptom Checker</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400">Get instant analysis with confidence levels and urgency indicators</p>
+      </div>
+      <div onclick="showPage('chatbot')" class="glass rounded-2xl p-6 card-hover cursor-pointer">
+        <div class="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-500 mb-4"><i class="fas fa-robot text-xl"></i></div>
+        <h3 class="font-bold text-lg mb-2">AI Health Chatbot</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400">24/7 conversational health assistant with voice support</p>
+      </div>
+      <div onclick="showPage('calculators')" class="glass rounded-2xl p-6 card-hover cursor-pointer">
+        <div class="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center text-green-500 mb-4"><i class="fas fa-calculator text-xl"></i></div>
+        <h3 class="font-bold text-lg mb-2">Health Calculators</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400">BMI, diabetes risk, heart risk and more</p>
+      </div>
+      <div onclick="showPage('dashboard')" class="glass rounded-2xl p-6 card-hover cursor-pointer">
+        <div class="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center text-purple-500 mb-4"><i class="fas fa-chart-line text-xl"></i></div>
+        <h3 class="font-bold text-lg mb-2">Health Dashboard</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400">Track your vitals, reports and health trends</p>
+      </div>
+      <div onclick="showPage('services')" class="glass rounded-2xl p-6 card-hover cursor-pointer">
+        <div class="w-12 h-12 rounded-xl bg-pink-500/20 flex items-center justify-center text-pink-500 mb-4"><i class="fas fa-file-medical text-xl"></i></div>
+        <h3 class="font-bold text-lg mb-2">Lab Report Analysis</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400">Upload PDF/images and get AI-explained results</p>
+      </div>
+      <div onclick="showPage('services')" class="glass rounded-2xl p-6 card-hover cursor-pointer">
+        <div class="w-12 h-12 rounded-xl bg-indigo-500/20 flex items-center justify-center text-indigo-500 mb-4"><i class="fas fa-pills text-xl"></i></div>
+        <h3 class="font-bold text-lg mb-2">Medicine Info</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400">Dosage, warnings, side effects & interactions</p>
+      </div>
+      <div onclick="showPage('services')" class="glass rounded-2xl p-6 card-hover cursor-pointer">
+        <div class="w-12 h-12 rounded-xl bg-red-500/20 flex items-center justify-center text-red-500 mb-4"><i class="fas fa-first-aid text-xl"></i></div>
+        <h3 class="font-bold text-lg mb-2">First Aid Guide</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400">Emergency guidance when every second counts</p>
+      </div>
+      <div onclick="showPage('services')" class="glass rounded-2xl p-6 card-hover cursor-pointer">
+        <div class="w-12 h-12 rounded-xl bg-teal-500/20 flex items-center justify-center text-teal-500 mb-4"><i class="fas fa-apple-alt text-xl"></i></div>
+        <h3 class="font-bold text-lg mb-2">AI Nutrition Planner</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400">Personalized meal plans based on your goals</p>
+      </div>
+      <div onclick="showPage('services')" class="glass rounded-2xl p-6 card-hover cursor-pointer">
+        <div class="w-12 h-12 rounded-xl bg-yellow-500/20 flex items-center justify-center text-yellow-500 mb-4"><i class="fas fa-dumbbell text-xl"></i></div>
+        <h3 class="font-bold text-lg mb-2">AI Fitness Planner</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400">Custom workout routines for your fitness level</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Specialized Trackers -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="glass rounded-3xl p-8 lg:p-12">
+      <h2 class="text-3xl font-bold mb-8 text-center">Specialized <span class="gradient-text">Health Trackers</span></h2>
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-gradient-to-br from-pink-500/10 to-purple-500/10 rounded-2xl p-6 border border-pink-500/20">
+          <i class="fas fa-brain text-3xl text-pink-500 mb-3"></i>
+          <h4 class="font-bold mb-1">Mental Wellness</h4>
+          <p class="text-xs text-gray-600 dark:text-gray-400">Mood tracking, meditation & therapy</p>
+        </div>
+        <div class="bg-gradient-to-br from-rose-500/10 to-red-500/10 rounded-2xl p-6 border border-rose-500/20">
+          <i class="fas fa-baby text-3xl text-rose-500 mb-3"></i>
+          <h4 class="font-bold mb-1">Pregnancy Tracker</h4>
+          <p class="text-xs text-gray-600 dark:text-gray-400">Week-by-week guidance</p>
+        </div>
+        <div class="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 rounded-2xl p-6 border border-blue-500/20">
+          <i class="fas fa-child text-3xl text-blue-500 mb-3"></i>
+          <h4 class="font-bold mb-1">Child Growth</h4>
+          <p class="text-xs text-gray-600 dark:text-gray-400">Milestone tracking & vaccines</p>
+        </div>
+        <div class="bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-2xl p-6 border border-green-500/20">
+          <i class="fas fa-syringe text-3xl text-green-500 mb-3"></i>
+          <h4 class="font-bold mb-1">Vaccination</h4>
+          <p class="text-xs text-gray-600 dark:text-gray-400">Smart reminders & records</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Disclaimer -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="glass rounded-2xl p-6 border-l-4 border-yellow-500">
+      <div class="flex gap-4">
+        <i class="fas fa-exclamation-triangle text-yellow-500 text-xl mt-1"></i>
+        <div>
+          <h4 class="font-bold mb-1">Medical Disclaimer</h4>
+          <p class="text-sm text-gray-600 dark:text-gray-400">MedAI Bharat provides AI-generated health information for educational purposes only. It does not replace professional medical advice, diagnosis, or treatment. Always consult a licensed healthcare provider for medical decisions. In emergencies, call 108 or visit your nearest hospital immediately.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="border-t border-gray-200 dark:border-gray-800 py-12 mt-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid md:grid-cols-4 gap-8 mb-8">
+        <div>
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-10 h-10 rounded-xl gradient-bg flex items-center justify-center text-white"><i class="fas fa-heartbeat"></i></div>
+            <div class="font-bold text-lg">MedAI Bharat</div>
+          </div>
+          <p class="text-sm text-gray-600 dark:text-gray-400">India's AI-powered healthcare revolution. Made with ❤️ in India.</p>
+          <div class="flex gap-3 mt-4">
+            <a class="w-8 h-8 rounded-lg glass flex items-center justify-center hover:text-orange-500 cur
